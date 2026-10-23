@@ -1,0 +1,9 @@
+export type Category = 'feminino'|'masculino'|'infantil-feminino'|'infantil-masculino'|'bolsas';
+export type Store = {id:string;name:string;label:string;address:string;phone:string|null;hours:string};
+export type Product = {id:string;name:string;brand:string;category:Category;description:string;image_url:string;active:boolean;featured:boolean};
+export type Variant = {id:string;product_id:string;store_id:string;size:string;price_cents:number;stock:number;reserved:number;sku:string};
+export type OrderItem = {variant_id:string;product_id:string;name:string;size:string;quantity:number;unit_price_cents:number};
+export type Order = {id:string;store_id:string;customer_name:string;customer_email:string;total_cents:number;status:'pending'|'paid'|'cancelled'|'refunded'|'review';channel:'online'|'store';created_at:string;items:OrderItem[]};
+export type CartItem = {variant_id:string;quantity:number};
+export type Member = {user_id:string;store_id:string;role:'owner'|'manager'};
+export type Data = {stores:Store[];products:Product[];variants:Variant[];orders:Order[];members:Member[]};

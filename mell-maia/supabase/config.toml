@@ -1,0 +1,13 @@
+project_id = "mell-maia"
+
+[auth]
+enable_signup = false
+
+[functions.checkout]
+verify_jwt = false
+
+[functions.payment-webhook]
+verify_jwt = false
+
+# checkout is a guest endpoint protected by Turnstile + rate limits.
+# payment-webhook authenticates the Mercado Pago HMAC signature itself.

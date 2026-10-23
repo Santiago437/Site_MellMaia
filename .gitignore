@@ -1,0 +1,29 @@
+# Dependencies are restored with npm ci on each computer.
+node_modules/
+**/node_modules/
+
+# Generated builds, caches and local tools.
+dist/
+**/dist/
+.tools/
+**/.tools/
+.sites*/
+**/.sites*/
+.openai/
+**/.openai/
+*.tsbuildinfo
+*.log
+*.zip
+
+# Private environment files never belong in Git.
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+
+# Operating system files.
+Thumbs.db
+Desktop.ini
+.DS_Store

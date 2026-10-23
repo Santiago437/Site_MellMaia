@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createHmac} from 'node:crypto';
+import {verifySignature,paymentMatches,validateCart} from '../supabase/functions/_shared/payment.mjs';
+const secret='test-only-secret',ts='1792512000',requestId='request-example',dataId='123456';
+const now=Number(ts)*1000;
+const signature=(id=dataId,request=requestId)=>`ts=${ts},v1=${createHmac('sha256',secret).update(`id:${id};request-id:${request};ts:${ts};`).digest('hex')}`;
+test('accepts valid Mercado Pago signature',async()=>assert.equal(await verifySignature({signature:signature(),requestId,dataId,secret,now}),true));
+test('rejects signature after resource or request tampering',async()=>{for(const overrides of [{dataId:'999'},{requestId:'attacker'},{secret:'wrong'},{signature:'ts=1,v1=00'}])assert.equal(await verifySignature({signature:signature(),requestId,dataId,secret,now,...overrides}),false);});
+test('rejects stale replay',async()=>assert.equal(await verifySignature({signature:signature(),requestId,dataId,secret,now:now+3600000}),false));
+test('checks amount, currency, merchant, reference and live mode',()=>{const order={id:'order-id',total_cents:15990};const p={external_reference:'order-id',transaction_amount:159.9,currency_id:'BRL',collector_id:123,live_mode:true};assert.equal(paymentMatches(p,order,'123'),true);for(const patch of [{transaction_amount:.01},{currency_id:'USD'},{collector_id:999},{external_reference:'other'},{live_mode:false}])assert.equal(paymentMatches({...p,...patch},order,'123'),false);});
+test('rejects empty, duplicate, excessive and negative cart quantities',()=>{const item={variant_id:'30000000-0000-4000-8000-000000000001',quantity:1};assert.equal(validateCart([item]),true);for(const cart of [[],[item,item],[{...item,quantity:-1}],[{...item,quantity:1.5}],[{...item,quantity:21}],[{variant_id:'injection',quantity:1}]])assert.equal(validateCart(cart),false);});
